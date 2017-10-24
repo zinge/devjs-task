@@ -14,7 +14,7 @@ export default {
     error: []
   }),
 
-  mounted: {
+  methods: {
     getAllPosts () {
       axios.get('https://jsonplaceholder.typicode.com/posts')
       .then(response => {
@@ -24,6 +24,10 @@ export default {
         this.error.push(err)
       })
     }
+  },
+
+  mounted () {
+    this.getAllPosts()
   }
 }
 </script>
