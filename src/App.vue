@@ -2,76 +2,92 @@
   <div id="app">
     <div class="section">
       <div class="container">
-        <div class="field is-grouped is-grouped-centered" v-if="!userSelected">
-          <div class="control">
-            <div class="select">
-              <select v-model="userSelected">
-                <option disabled value="false">who are you? please select</option>
-                <option v-for="user in userPool" :key="user.id" :value="user.id">{{user.name}}</option>
-              </select>
-            </div>
+        <!-- posts -->
+        <article class="message" v-for="post in posts" :key="post.id">
+          <div class="message-header">
+            <p>{{post.title}}</p>
+            <button class="delete" aria-label="delete"></button>
           </div>
-        </div>
-        <div class="field is-grouped is-grouped-right" v-if="userSelected">
-          <div class="control">
-            <a class="button" @click="changeUser">You {{currentUser.name}}, change?</a>
-          </div>
-        </div>
-        <div class="wrapper" v-if="userSelected">
-          <article class="message" v-for="post in postPool" :key="post.id">
-            <div class="message-header">
-              <strong>{{post.id + ': ' +post.title}}</strong>
-              <button class="delete" aria-label="delete"></button>
+          <div class="message-body">
+            {{post.body}}
+            <!-- post buttons -->
+            <div class="field is-grouped is-grouped-right">
+              <div class="control">
+                <a class="button is-small" @click="createdComment = post.id" :disabled="editedPost === post.id ? true : false">add comments</a>
+              </div>
+              <div class="control">
+                <a class="button is-small" @click="showComments(post.id)" :disabled="editedPost === post.id ? true : false">{{ commentsInPost ? 'hide' : 'show'}} comments</a>
+              </div>
+              <div class="control">
+                <a class="button is-small" @click="editedPost = post.id">edit</a>
+              </div>
             </div>
-            <div class="message-body">
-              {{post.body}}<br>
+            <!-- post edit form -->
+            <div class="box" v-if="editedPost === post.id">
+              <div class="field">
+                <label class="label">Title</label>
+                <div class="control">
+                  <input class="input" type="text" v-model="currentPost.title">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Body</label>
+                <div class="control">
+                  <textarea class="textarea" v-model="currentPost.body"></textarea>
+                </div>
+              </div>
               <div class="field is-grouped is-grouped-right">
                 <div class="control">
-                  <a class="button" @click="getComments(post.id)" :disabled="editedPost[post.id]">{{ showComments[post.id] ? 'hide' : 'show' }} comments</a>
+                  <a class="button is-small" @click="editPost(post.id)">save</a>
                 </div>
                 <div class="control">
-                  <a class="button" @click="editPost(post.id)" :disabled="post.userId === currentUser.id ? false : true" >{{ editedPost[post.id] ? 'close' : 'edit' }}</a>
-                </div>
-              </div>
-              <div class="box" v-if="showComments[post.id]">
-                <article class="message is-small is-info" v-for="comment in comments[post.id]" :key="comment.id">
-                  <div class="message-header">
-                    <p>{{comment.email}}</p>
-                    <button class="delete" aria-label="delete"></button>
-                  </div>
-                  <div class="message-body">
-                    {{comment.body}}
-                    <br>
-                    <div class="field is-grouped is-grouped-right">
-                      <div class="control">
-                        <a class="button" @click="editComment(comment.id)" :disabled="comment.email === currentUser.email ? false : true" >{{ editedComment[comment.id] ? 'close' : 'save' }}</a>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              </div>
-              <div class="box" v-if="editedPost[post.id]">
-                <div class="field">
-                  <label class="label">Title</label>
-                  <div class="control">
-                    <input class="input" type="text" placeholder="title input">
-                  </div>
-                </div>
-                <div class="field">
-                  <label class="label">Comment</label>
-                  <div class="control">
-                    <textarea class="textarea" placeholder="comment input"></textarea>
-                  </div>
-                </div>
-                <div class="field is-grouped is-grouped-right">
-                  <div class="control">
-                    <a class="button">save</a>
-                  </div>
+                  <a class="button is-small" @click="editedPost = 0">cancel</a>
                 </div>
               </div>
             </div>
-          </article>
-        </div>
+            <!-- comments -->
+            <div class="box" v-if="commentsInPost === post.id">
+              <article class="message is-small" v-for="comment in comments" :key="comment.id">
+                <div class="message-header">
+                  <p>{{comment.email}}</p>
+                  <button class="delete" aria-label="delete"></button>
+                </div>
+                <div class="message-body">
+                  {{comment.body}}
+                </div>
+              </article>
+            </div>
+            <!-- comment add form -->
+            <div class="box" v-if="createdComment === post.id">
+              <div class="field">
+                <label class="label">Email</label>
+                <div class="control">
+                  <input class="input" type="email" v-model="currentUser.email">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Name</label>
+                <div class="control">
+                  <input class="input" type="text" v-model="currentComment.name">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Body</label>
+                <div class="control">
+                  <textarea class="textarea" v-model="currentComment.body"></textarea>
+                </div>
+              </div>
+              <div class="field is-grouped is-grouped-right">
+                <div class="control">
+                  <a class="button is-small" @click="addComment(post.id)">save</a>
+                </div>
+                <div class="control">
+                  <a class="button is-small" @click="createdComment = 0">cancel</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
     </div>
   </div>
@@ -83,91 +99,81 @@ import axios from 'axios'
 export default {
   name: 'app',
   data: () => ({
-    userPool: [],
-    postPool: [],
-    userSelected: false,
-    currentUser: {},
-    error: [],
-    comments: [false],
-    showComments: [false],
-    editedPost: [false],
-    editedComment: [false]
+    posts: [],
+    currentPost: {
+      title: '',
+      body: ''
+    },
+    currentComment: {
+      name: '',
+      body: ''
+    },
+    comments: [],
+    editedPost: 0,
+    commentsInPost: 0,
+    createdComment: 0,
+    currentUser: {
+      email: ''
+    },
+    API: {
+      baseUrl: 'https://jsonplaceholder.typicode.com',
+      page: 1,
+      postsPerPage: 5
+    }
   }),
 
-  watch: {
-    userSelected () {
-      if (this.userSelected) {
-        let url = 'https://jsonplaceholder.typicode.com/users/' + this.userSelected
-        axios.get(url)
-        .then(response => {
-          this.currentUser = response.data
-        })
-        .catch(err => {
-          this.error.push(err)
-        })
-      } else {
-        this.currentUser = {}
-      }
-    }
-  },
-
   methods: {
-    getAllPosts () {
-      axios.get('https://jsonplaceholder.typicode.com/posts?_page=1&_limit=5')
+    getPosts () {
+      axios.get(this.API.baseUrl + '/posts?_page=' + this.API.page + '&_limit=' + this.API.postsPerPage)
       .then(response => {
-        this.postPool = response.data
+        this.posts = response.data
       })
       .catch(err => {
-        this.error.push(err)
+        console.log(err)
       })
     },
 
-    getComments (postId) {
-      if (this.showComments[postId]) {
-        this.showComments.splice(postId, 1, false)
-      } else {
-        let url = 'https://jsonplaceholder.typicode.com/posts/' + postId + '/comments'
-        axios.get(url)
+    showComments (postId) {
+      if (!this.commentsInPost) {
+        axios.get(this.API.baseUrl + '/posts/' + postId + '/comments')
         .then(response => {
-          this.comments[postId] = response.data
-          this.showComments.splice(postId, 1, true)
+          this.comments = response.data
+          this.commentsInPost = postId
         })
         .catch(err => {
-          this.error.push(err)
+          console.log(err)
         })
+      } else {
+        this.commentsInPost = 0
       }
     },
 
     editPost (postId) {
-      if (this.editedPost[postId]) {
-        this.editedPost.splice(postId, 1, false)
-      } else {
-        if (this.editedPost.length < postId) {
-          this.editedPost.splice(postId)
-        }
-        this.editedPost.splice(postId, 1, true)
-        this.showComments.splice(postId, 1, false)
-      }
-    },
-
-    getAllUsers () {
-      axios.get('https://jsonplaceholder.typicode.com/users')
+      axios.patch(this.API.baseUrl + '/posts/' + postId, this.currentPost)
       .then(response => {
-        this.userPool = response.data
+        console.log(response)
       })
       .catch(err => {
-        this.error.push(err)
+        console.log(err)
       })
+      this.editedPost = 0
     },
 
-    changeUser () {
-      this.userSelected = false
+    addComment (postId) {
+      Object.assign(this.currentComment, this.currentUser, {'postId': postId})
+      axios.post(this.API.baseUrl + '/posts/' + postId + '/comments', this.currentComment)
+      .then(response => {
+        console.log(response.data)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+      this.createdComment = postId
     }
   },
 
   mounted () {
-    this.getAllUsers()
-    this.getAllPosts()
+    this.getPosts()
   }
 }
 </script>
