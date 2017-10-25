@@ -34,13 +34,19 @@
                 </div>
               </div>
               <div class="box" v-if="showComments[post.id]">
-                <article class="message" v-for="comment in comments[post.id]" :key="comment.id">
+                <article class="message is-small is-info" v-for="comment in comments[post.id]" :key="comment.id">
                   <div class="message-header">
                     <p>{{comment.email}}</p>
                     <button class="delete" aria-label="delete"></button>
                   </div>
                   <div class="message-body">
                     {{comment.body}}
+                    <br>
+                    <div class="field is-grouped is-grouped-right">
+                      <div class="control">
+                        <a class="button" @click="editComment(comment.id)" :disabled="comment.email === currentUser.email ? false : true" >{{ editedComment[comment.id] ? 'close' : 'save' }}</a>
+                      </div>
+                    </div>
                   </div>
                 </article>
               </div>
@@ -85,7 +91,7 @@ export default {
     comments: [false],
     showComments: [false],
     editedPost: [false],
-    editComment: [false]
+    editedComment: [false]
   }),
 
   watch: {
