@@ -52,7 +52,7 @@
               </div>
             </div>
             <!-- comments -->
-            <div class="box" v-if="commentsInPost === post.id">
+            <div class="box" v-if="commentsInPost === post.id && createdComment !== post.id">
               <article class="message is-small" v-for="comment in comments" :key="comment.id">
                 <div class="message-header">
                   <p>{{comment.email}}</p>
