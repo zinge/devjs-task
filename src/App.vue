@@ -2,6 +2,11 @@
   <div id="app">
     <div class="section">
       <div class="container">
+        <div class="field has-addons has-addons-right">
+          <div class="control">
+            <input class="input" type="email" v-model="currentUser.email" placeholder="please you email">
+          </div>
+        </div>
         <!-- posts -->
         <article class="message" v-for="post in posts" :key="post.id">
           <div class="message-header">
@@ -54,17 +59,16 @@
                 </div>
                 <div class="message-body">
                   {{comment.body}}
+                  <div class="field is-grouped is-grouped-right" v-if="comment.email === currentUser.email">
+                    <div class="control">
+                      <a class="button is-small" >edit</a>
+                    </div>
+                  </div>
                 </div>
               </article>
             </div>
             <!-- comment add form -->
             <div class="box" v-if="createdComment === post.id">
-              <div class="field">
-                <label class="label">Email</label>
-                <div class="control">
-                  <input class="input" type="email" v-model="currentUser.email">
-                </div>
-              </div>
               <div class="field">
                 <label class="label">Name</label>
                 <div class="control">
