@@ -2,6 +2,7 @@
   <div id="app">
     <div class="section">
       <div class="container">
+        <!-- emai form -->
         <div class="field has-addons has-addons-right">
           <div class="control">
             <input class="input" type="email" v-model="currentUser.email" placeholder="please you email">
@@ -21,10 +22,10 @@
                 <a class="button is-small" @click="createdComment = post.id" :disabled="editedPost === post.id ? true : false">add comments</a>
               </div>
               <div class="control">
-                <a class="button is-small" @click="showComments(post.id)" :disabled="editedPost === post.id ? true : false">{{ commentsInPost ? 'hide' : 'show'}} comments</a>
+                <a class="button is-small" @click="showComments(post.id)" :disabled="(editedPost === post.id || createdComment === post.id) ? true : false">{{ commentsInPost ? 'hide' : 'show'}} comments</a>
               </div>
               <div class="control">
-                <a class="button is-small" @click="editedPost = post.id">edit</a>
+                <a class="button is-small" @click="editedPost = post.id" :disabled="createdComment === post.id ? true : false" >edit</a>
               </div>
             </div>
             <!-- post edit form -->
@@ -61,7 +62,7 @@
                   {{comment.body}}
                   <div class="field is-grouped is-grouped-right" v-if="comment.email === currentUser.email">
                     <div class="control">
-                      <a class="button is-small" >edit</a>
+                      <a class="button is-small">edit</a>
                     </div>
                   </div>
                 </div>
