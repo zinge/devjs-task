@@ -1,0 +1,196 @@
+<template>
+  <div id="app">
+    <div class="section">
+      <div class="container">
+        <!-- emai form -->
+        <div class="field has-addons has-addons-right">
+          <div class="control">
+            <input class="input" type="email" v-model="currentUser.email" placeholder="please you email">
+          </div>
+        </div>
+        <!-- posts -->
+        <article class="message" v-for="post in posts" :key="post.id">
+          <div class="message-header">
+            <p>{{post.title}}</p>
+            <button class="delete" aria-label="delete"></button>
+          </div>
+          <div class="message-body">
+            {{post.body}}
+            <!-- post buttons -->
+            <div class="field is-grouped is-grouped-right">
+              <div class="control">
+                <a class="button is-small" @click="createdComment = post.id" :disabled="editedPost === post.id ? true : false">add comments</a>
+              </div>
+              <div class="control">
+                <a class="button is-small" @click="showComments(post.id)" :disabled="(editedPost === post.id || createdComment === post.id) ? true : false">{{ commentsInPost ? 'hide' : 'show'}} comments</a>
+              </div>
+              <div class="control">
+                <a class="button is-small" @click="editedPost = post.id" :disabled="createdComment === post.id ? true : false" >edit</a>
+              </div>
+            </div>
+            <!-- post edit form -->
+            <div class="box" v-if="editedPost === post.id">
+              <div class="field">
+                <label class="label">Title</label>
+                <div class="control">
+                  <input class="input" type="text" v-model="currentPost.title">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Body</label>
+                <div class="control">
+                  <textarea class="textarea" v-model="currentPost.body"></textarea>
+                </div>
+              </div>
+              <div class="field is-grouped is-grouped-right">
+                <div class="control">
+                  <a class="button is-small" @click="editPost(post.id)">save</a>
+                </div>
+                <div class="control">
+                  <a class="button is-small" @click="editedPost = 0">cancel</a>
+                </div>
+              </div>
+            </div>
+            <!-- comments -->
+            <div class="box" v-if="commentsInPost === post.id && createdComment !== post.id">
+              <article class="message is-small" v-for="comment in comments" :key="comment.id">
+                <div class="message-header">
+                  <p>{{comment.email}}</p>
+                  <button class="delete" aria-label="delete"></button>
+                </div>
+                <div class="message-body">
+                  {{comment.body}}
+                  <div class="field is-grouped is-grouped-right" v-if="comment.email === currentUser.email">
+                    <div class="control">
+                      <a class="button is-small">edit</a>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
+            <!-- comment add form -->
+            <add-comment :post="post"></add-comment>
+            <!-- <div class="box" v-if="createdComment === post.id">
+              <div class="field">
+                <label class="label">Name</label>
+                <div class="control">
+                  <input class="input" type="text" v-model="currentComment.name">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label">Body</label>
+                <div class="control">
+                  <textarea class="textarea" v-model="currentComment.body"></textarea>
+                </div>
+              </div>
+              <div class="field is-grouped is-grouped-right">
+                <div class="control">
+                  <a class="button is-small" @click="addComment(post.id)">save</a>
+                </div>
+                <div class="control">
+                  <a class="button is-small" @click="createdComment = 0">cancel</a>
+                </div>
+              </div>
+            </div> -->
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { HTTP } from './http'
+
+import AddComment from './components/comments/AddComment.vue'
+
+export default {
+  name: 'app',
+  data: () => ({
+    posts: [],
+    currentPost: {
+      title: '',
+      body: ''
+    },
+    currentComment: {
+      name: '',
+      body: ''
+    },
+    comments: [],
+    editedPost: 0,
+    commentsInPost: 0,
+    createdComment: 0,
+    currentUser: {
+      email: ''
+    },
+    page: {
+      currentPage: 1,
+      postsPerPage: 5
+    }
+  }),
+
+  components: {
+    AddComment
+  },
+
+  methods: {
+    getPosts () {
+      HTTP.get('posts?_page=' + this.page.currentPage + '&_limit=' + this.page.postsPerPage)
+      .then(response => {
+        this.posts = response.data
+      })
+      .catch(err => {
+        console.log(err)
+      })
+    },
+
+    showComments (postId) {
+      if (!this.commentsInPost) {
+        HTTP.get('posts/' + postId + '/comments')
+        .then(response => {
+          this.comments = response.data
+          this.commentsInPost = postId
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      } else {
+        this.commentsInPost = 0
+      }
+    },
+
+    editPost (postId) {
+      HTTP.patch('posts/' + postId, this.currentPost)
+      .then(response => {
+        console.log(response)
+      })
+      .catch(err => {
+        console.log(err)
+      })
+      this.editedPost = 0
+    }
+    // addComment (postId) {
+    //   Object.assign(this.currentComment, this.currentUser, {'postId': postId})
+    //   axios.post(this.API.baseUrl + '/posts/' + postId + '/comments', this.currentComment)
+    //   .then(response => {
+    //     console.log(response.data)
+    //   })
+    //   .catch(err => {
+    //     console.log(err)
+    //   })
+    //   this.createdComment = postId
+    // }
+  },
+
+  mounted () {
+    this.getPosts()
+  }
+}
+</script>
+
+<style>
+#app {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+</style>
