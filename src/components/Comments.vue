@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import { HTTP } from '../http'
+import { comments } from '@/http'
 
 export default {
   name: 'Comments',
@@ -28,7 +28,13 @@ export default {
 
   methods: {
     getComments () {
-      HTTP.get('https://jsonplaceholder.typicode.com/posts/' + this.postId + '/comments')
+      let config = {
+        params: {
+          postId: this.postId
+        }
+      }
+
+      comments(config)
       .then(response => {
         this.comments = response.data
       })

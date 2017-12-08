@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { HTTP } from './http'
+import { posts } from '@/http'
 
 import Post from './components/Post.vue'
 
@@ -19,9 +19,9 @@ export default {
   data: () => ({
     posts: [],
 
-    page: {
-      currentPage: 1,
-      postsPerPage: 5
+    params: {
+      _limit: 5,
+      _page: 1
     }
   }),
 
@@ -35,7 +35,11 @@ export default {
 
   methods: {
     getPosts () {
-      HTTP.get('https://jsonplaceholder.typicode.com/posts?_page=' + this.page.currentPage + '&_limit=' + this.page.postsPerPage)
+      let config = {
+        params: this.params
+      }
+
+      posts(config)
       .then(response => {
         this.posts = response.data
       })

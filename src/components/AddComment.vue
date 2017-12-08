@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import { HTTP } from '../../http'
+import { api } from '@/http'
 
 export default {
   name: 'AddComment',
@@ -45,7 +45,7 @@ export default {
   methods: {
     addComment (postId) {
       Object.assign(this.currentComment, this.currentUser, {'postId': postId})
-      HTTP.post('/posts/' + postId + '/comments', this.currentComment)
+      api.post('/posts/' + postId + '/comments', this.currentComment)
       .then(response => {
         console.log(response.data)
       })

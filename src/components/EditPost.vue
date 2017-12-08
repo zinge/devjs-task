@@ -15,10 +15,10 @@
       </div>
       <div class="field is-grouped is-grouped-right">
         <div class="control">
-          <a class="button is-small" @click="edit">save</a>
+          <a class="button is-small" @click="editCurrentPost">save</a>
         </div>
         <div class="control">
-          <a class="button is-small" @click="closeEditForm">cancel</a>
+          <a class="button is-small" @click="closeEditPost">cancel</a>
         </div>
       </div>
     </div>
@@ -26,20 +26,25 @@
 </template>
 
 <script>
-import { HTTP } from '../http'
+import { posts } from '@/http'
 
 export default {
   name: 'EditPost',
 
-  props: ['post'],
+  props: ['postId'],
 
   data: () => ({
     currentPost: {}
   }),
 
   methods: {
-    edit () {
-      HTTP.patch('https://jsonplaceholder.typicode.com/posts/' + this.currentPost.id, this.currentPost)
+    editCurrentPost () {
+      let config = {
+        data: this.currentPost,
+        method: 'patch'
+      }
+
+      posts(config, this.postId)
       .then(response => {
         console.log(response)
       })
@@ -49,16 +54,28 @@ export default {
     },
 
     initCurrentPostData () {
-      this.currentPost = this.post
+      posts({
+        params: {
+          id: this.postId
+        }
+      })
+      .then(response => {
+        this.currentPost = response.data[0]
+      })
+      .catch(err => {
+        console.log(err)
+      })
     },
 
-    closeEditForm () {
-      this.$emit('closeEdit', false)
+    closeEditPost () {
+      this.$emit('closeEditPost', false)
     }
   },
 
   mounted () {
-    this.initCurrentPostData()
+    if (this.postId) {
+      this.initCurrentPostData()
+    }
   }
 }
 </script>

@@ -10,7 +10,7 @@
           <!-- post menu -->
           <div class="field is-grouped is-grouped-right">
             <div class="control">
-              <a class="button is-small" @click="changeCommentsState" >{{ showComments ? 'hide' : 'show'}} comments</a>
+              <a class="button is-small" @click="changeCommentsState" >{{ showComments ? 'hide' : 'show' }} comments</a>
             </div>
             <div class="control">
               <a class="button is-small" @click="changePostEditState">edit</a>
@@ -18,7 +18,7 @@
           </div>
           <!-- comments -->
           <comments v-if="showComments" :postId="post.id"></comments>
-          <edit-post v-if="editPost" :post="post" v-on:closeEditForm="(state) => {this.editPost = state}"></edit-post>
+          <edit-post v-if="editPost" :postId="post.id" v-on:closeEditPost="emitCloseEditPost"></edit-post>
         </div>
     </article>
   </div>
@@ -55,6 +55,10 @@ export default {
       if (this.editPost) {
         this.showComments = false
       }
+    },
+
+    emitCloseEditPost (state) {
+      this.editPost = state
     }
   }
 }
