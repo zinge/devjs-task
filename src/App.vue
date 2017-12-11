@@ -20,8 +20,8 @@ export default {
     posts: [],
 
     params: {
-      _limit: 5,
-      _page: 1
+      _limit: 5, // postPerPage
+      _page: 1 // currentPage
     }
   }),
 

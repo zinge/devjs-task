@@ -2,23 +2,29 @@
   <div class="add-comment">
     <div class="box">
       <div class="field">
-        <label class="label">Name</label>
+        <label class="label">You email address</label>
+        <div class="control">
+          <input class="input" type="text" v-model="currentComment.email">
+        </div>
+      </div>
+      <div class="field">
+        <label class="label">Comment name</label>
         <div class="control">
           <input class="input" type="text" v-model="currentComment.name">
         </div>
       </div>
       <div class="field">
-        <label class="label">Body</label>
+        <label class="label">Comment body</label>
         <div class="control">
           <textarea class="textarea" v-model="currentComment.body"></textarea>
         </div>
       </div>
       <div class="field is-grouped is-grouped-right">
         <div class="control">
-          <a class="button is-small" @click="addComment(post.id)">save</a>
+          <a class="button is-small" @click="addComment(postId)">save</a>
         </div>
         <div class="control">
-          <a class="button is-small" @click="createdComment = 0">cancel</a>
+          <a class="button is-small" @click="closeAddComment">cancel</a>
         </div>
       </div>
     </div>
@@ -26,36 +32,40 @@
 </template>
 
 <script>
-import { api } from '@/http'
+import { comments } from '@/http'
 
 export default {
   name: 'AddComment',
 
-  props: ['post'],
+  props: ['postId'],
 
   data: () => ({
     currentComment: {
+      email: '',
       name: '',
       body: ''
-    },
-
-    createdComment: 0
+    }
   }),
 
   methods: {
     addComment (postId) {
-      Object.assign(this.currentComment, this.currentUser, {'postId': postId})
-      api.post('/posts/' + postId + '/comments', this.currentComment)
+      let config = {
+        data: this.currentComment,
+        method: 'post'
+      }
+      comments(config, this.postId)
       .then(response => {
-        console.log(response.data)
+        console.log(response)
       })
       .catch(err => {
         console.log(err)
       })
-      // this.createdComment = postId
+    },
+
+    closeAddComment () {
+      this.$emit('closeAddComment', false)
     }
   }
-
 }
 </script>
 

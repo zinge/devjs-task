@@ -17,8 +17,15 @@
             </div>
           </div>
           <!-- comments -->
-          <comments v-if="showComments" :postId="post.id"></comments>
-          <edit-post v-if="editPost" :postId="post.id" v-on:closeEditPost="emitCloseEditPost"></edit-post>
+          <comments
+            v-if="showComments"
+            :postId="post.id"
+          ></comments>
+          <edit-post
+            v-if="showEditPost"
+            :postId="post.id"
+            v-on:closeEditPost="emitCloseEditPost"
+          ></edit-post>
         </div>
     </article>
   </div>
@@ -33,7 +40,7 @@ export default {
 
   data: () => ({
     showComments: false,
-    editPost: false
+    showEditPost: false
   }),
 
   props: ['post'],
@@ -46,19 +53,19 @@ export default {
     changeCommentsState () {
       this.showComments = !this.showComments
       if (this.showComments) {
-        this.editPost = false
+        this.showEditPost = false
       }
     },
 
     changePostEditState () {
-      this.editPost = !this.editPost
-      if (this.editPost) {
+      this.showEditPost = !this.showEditPost
+      if (this.showEditPost) {
         this.showComments = false
       }
     },
 
     emitCloseEditPost (state) {
-      this.editPost = state
+      this.showEditPost = state
     }
   }
 }
