@@ -1,5 +1,7 @@
 # devjs-task
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/zinge/devjs-task.svg)](https://greenkeeper.io/)
+
 > A Vue.js project
 
 ## Build Setup
